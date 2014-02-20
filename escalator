@@ -1,0 +1,82 @@
+package DT;
+use Mojo::Base -base;
+use Mojo::DOM;
+use Mojo::Util 'slurp';
+
+has dom => sub { Mojo::DOM->new(slurp shift->file) };
+
+has '_file';
+has '_branch';
+
+has 'title';
+has 'description';
+
+has 'prompt';
+has 'options' => sub { [] };
+has 'speedcode';
+has 'details';
+
+sub new {
+  my $self = shift->SUPER::new;
+  my ($file, $branch) = @_;
+  $self->_file($file);
+  $self->_branch(qr/^$branch$/);
+  $self->title($self->dom->at('tree > title')->text);
+  $self->description($self->dom->at('tree > description')->text);
+  for my $d1 ( $self->dom->find('tree > branch')->grep(sub{$_->{id} =~ $self->_branch}) ) {
+    if ( $d1->at('speedcode')->[0] ) {
+      $self->prompt($d1->at('content')->text);
+      $self->speedcode($d1->at('speedcode')->text);
+      $self->details($d1->at('details')->text);
+    } else {
+      $self->prompt($d1->at('content')->text);
+      for ( $d1->find('fork')->[0]->each ) {
+        if ( $_->text ) {
+          push @{$self->options}, [$_->{target}, $_->text];
+        } else {
+          $self->options([$_->{target}]);
+          #__PACKAGE__->new($_->{target});
+        }
+      }
+    }
+  }
+  $self;
+}
+
+package main;
+
+use Mojolicious::Lite;
+
+get '/' => sub {
+  my $self = shift;
+} => 'index';
+
+get '/:file/#branch' => {branch => 1} => sub {
+  my $self = shift;
+  $self->render(dt => DT->new($self->param('file') => $self->param('branch')));
+} => 'helpdesk';
+
+app->start;
+
+__DATA__
+@@ index.html.ep
+<a href="<%= url_for 'helpdesk' %>Helpdesk</a>
+
+@@ helpdesk.html.ep
+<%= $dt->title %><br />
+<%= $dt->description %><br />
+% if ( $dt->speedcode ) {
+  Action / Resolution: <%= $dt->prompt %><br />
+  Select speedcode: <%= $dt->speedcode %><br />
+  CnP these details into your ticket details:<br />
+  <%= $dt->description %>
+% } else {
+  <%= $dt->prompt %>
+  % for ( @{$dt->options} ) {
+    % if ( ref $_ ) {
+      (<%= $_->[0] %>) <%= $_->[1] %><br />
+    % } else {
+      Go back to: (<%= $_ %>)<br />
+    % }
+  % }
+% }

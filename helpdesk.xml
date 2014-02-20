@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<tree>
+  <title>Helpdesk</title>
+  <description>Escalator</description>
+  <branch id="1">
+    <content>What is the problem?</content>
+    <fork target="1.1">Cannot connect to the Internet</fork>
+    <fork target="1.2">Cannot connect to the Kloud</fork>
+    <fork target="1.3">Cannot print</fork>
+  </branch>
+  <branch id="1.1">
+    <content>Can you browse to google.com?</content>
+    <fork target="1.1.1">Yes</fork>
+    <fork target="1.1.2">No</fork>
+  </branch>
+  <branch id="1.2">
+    <content>Do you like faux-meat?</content>
+    <fork target="1.2.1">Yes</fork>
+    <fork target="1.2.2">No</fork>
+  </branch>
+  <branch id="1.1.1">
+    <content>You are connected to the Internet.  Close ticket.</content>
+    <speedcode>0001</speedcode>
+    <details>Client reports that...</details>
+  </branch>
+  <branch id="1.1.2">
+    <content>Can you ping google.com?</content>
+    <fork target="1.1.2.1">Yes</fork>
+    <fork target="1.1.2.2">No</fork>
+    <fork target="1.1.2.3">How do I do that?</fork>
+  </branch>
+  <branch id="1.1.2.1">
+    <content>You are connected to the Internet.  Close ticket.</content>
+    <speedcode>0001</speedcode>
+    <details>Client reports that...</details>
+  </branch>
+  <branch id="1.1.2.2">
+    <content>You are not connected to the Internet.  Escalate ticket.</content>
+    <speedcode>0001</speedcode>
+    <details>Client reports that...</details>
+  </branch>
+  <branch id="1.1.2.3">
+    <content>Start...run... cmd "ping google.com" [enter]</content>
+    <fork target="1.1.2"></fork>
+  </branch>
+</tree>
