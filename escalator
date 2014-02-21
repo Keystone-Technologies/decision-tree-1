@@ -83,7 +83,7 @@ __DATA__
           $(this).on("click", function(e) {
             e.preventDefault();
             $.get($(this).attr('href'), function(data){
-              $("#escalator").append(data);
+              $("#escalator").html(data);
               escalator();
             });
             return false;
@@ -113,7 +113,7 @@ __DATA__
           $(this).on("click", function(e) {
             e.preventDefault();
             $.get($(this).attr('href'), function(data){
-              $("#escalator").append(data);
+              $("#escalator").html(data);
               escalator();
             });
             return false;
@@ -121,7 +121,7 @@ __DATA__
         });
       };
       $(document).ready(function(){
-        $.get("<%= url_for $dt->dt %>", function(data){
+        $.get("<%= url_for '_escalator', dt => $dt->dt, branch => '1' %>", function(data){
           $("#escalator").append(data);
           escalator();
         });
